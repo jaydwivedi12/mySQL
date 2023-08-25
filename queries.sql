@@ -78,7 +78,22 @@ WHERE first_name BETWEEN 'b' AND 'e';
 SELECT * FROM actor 
 WHERE actor_id IN (1,5,10,15);
 
-select * from actor
-where not(actor_id=1);
+SELECT * FROM actor
+WHERE NOT(actor_id=1);
+
+SELECT * FROM actor 
+WHERE actor_id BETWEEN 2 AND 7 
+AND (first_name="nick" OR first_name='ed');
+
+SELECT * FROM actor
+WHERE NOT(last_name LIKE "%a%" AND last_name LIKE'%e');
+
+SELECT * FROM actor 
+WHERE first_name NOT IN("grace","matthew","joe") 
+AND actor_id<15; 
+
+SELECT * FROM actor
+ WHERE NOT(last_name LIKE '%a%' AND first_name LIKE '%i%') 
+ AND actor_id BETWEEN 10 AND 20;
 
 
