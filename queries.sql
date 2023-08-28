@@ -86,7 +86,7 @@ WHERE actor_id BETWEEN 2 AND 7
 AND (first_name="nick" OR first_name='ed');
 
 SELECT * FROM actor
-WHERE NOT(last_name LIKE "%a%" AND last_name LIKE'%e');
+WHERE NOT(last_name LIKE "%a%" AND last_name LIKE'%e%');
 
 SELECT * FROM actor 
 WHERE first_name NOT IN("grace","matthew","joe") 
@@ -95,5 +95,33 @@ AND actor_id<15;
 SELECT * FROM actor
  WHERE NOT(last_name LIKE '%a%' AND first_name LIKE '%i%') 
  AND actor_id BETWEEN 10 AND 20;
+ 
+ SELECT fid,title FROM film_list
+ WHERE fid<7 AND NOT(fid=4 OR fid=6);
 
+-- We do not use % in starting in LIKE for better optimization ,it is bad practice , use order by for sorting and then use like 
 
+SELECT * FROM film_list ORDER BY category DESC;
+
+SELECT * FROM film_list ORDER BY 4; -- column no = but column no <= selected column number
+
+SELECT price,fid,title FROM film_list ORDER BY 1;
+
+-- missing value are lowest priotity 
+SELECT * FROM address ORDER BY district;
+SELECT * FROM address ORDER BY district DESC, address_id ASC;
+
+SELECT * FROM address 
+LIMIT 3; -- we can't use limit with order by 
+
+SELECT * FROM address LIMIT 3,2; -- 3 is offset 
+SELECT * FROM address LIMIT 3 OFFSET 2 ;
+ 
+select 2+2;
+
+-- dummy table/dual table to check logic 
+-- pseudo column -> column -> specific meaning->already avaible with the system  
+select 1+2 from dual;
+select now() from dual;
+
+-- concat,concat-ws, substring
