@@ -117,11 +117,42 @@ LIMIT 3; -- we can't use limit with order by
 SELECT * FROM address LIMIT 3,2; -- 3 is offset 
 SELECT * FROM address LIMIT 3 OFFSET 2 ;
  
-select 2+2;
+SELECT 2+2;
 
 -- dummy table/dual table to check logic 
 -- pseudo column -> column -> specific meaning->already avaible with the system  
-select 1+2 from dual;
-select now() from dual;
+SELECT 1+2 FROM DUAL;
+SELECT NOW() FROM DUAL;
 
--- concat,concat-ws, substring
+-- concat,concat-ws, substring 
+-- string functions,DDL create ,data types, alter ,drop
+
+SELECT CHAR_LENGTH('jay'); -- give length
+SELECT LENGTH('jay'); -- give length in the memory
+SELECT CONCAT('H','i');
+SELECT CONCAT_WS("-" ,"hiI","heLlo");
+SELECT UPPER("JAY");
+SELECT UCASE("JAY");
+SELECT SUBSTR("HELlo",1,3);
+SELECT SUBSTR(SUBSTR("HELlo",1,3),2);
+SELECT INSTR("HELLO","e");
+SELECT LOCATE('A', 'rAJasthan', 3);
+SELECT LTRIM("     jay");
+
+SELECT TRIM(LEADING " " FROM "     xyz ");
+SELECT TRIM(TRAILING " " FROM "     xyz");
+SELECT TRIM(BOTH "Z" FROM "ZZazz     xyz zz");
+
+SELECT LPAD("hell",5,"#");
+SELECT RPAD("hell",7,"#");
+
+SELECT REPLACE("tushars","s","@");
+
+SELECT id,name FROM customer_list;
+DESC customer;
+DESC language;
+SELECT * FROM language;
+SELECT COUNT(*) FROM language;
+-- DML
+INSERT INTO language VALUES(NULL, "Gujarati",NOW());
+
