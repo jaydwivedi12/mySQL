@@ -155,4 +155,49 @@ SELECT * FROM language;
 SELECT COUNT(*) FROM language;
 -- DML
 INSERT INTO language VALUES(NULL, "Gujarati",NOW());
+INSERT INTO language VALUES(NULL,"punjabi",'2020-09-12 04:02:59');
+INSERT IGNORE INTO language VALUES(14,"Delhi",NOW());   -- ignore used to ignore error and give warning  
 
+INSERT INTO language(language_id,last_update,name) VALUES(NULL,NOW(),"japanese");
+DESC language;
+INSERT INTO language (name) VALUES ("tamil"); 
+
+INSERT INTO language(last_update,name) 
+VALUES(NOW(),"arab"),
+(NOW(),"arab"),
+(NOW(),"arab");
+
+INSERT INTO language SET name="hungarian";
+
+CREATE DATABASE test;
+CREATE DATABASE IF NOT EXISTS test;
+
+USE test;
+SHOW TABLES;
+
+-- create => table,index,view
+CREATE TABLE employee(id INT,name CHAR(20),email CHAR(20) );
+DESC employee;
+INSERT INTO employee VALUE(1,"jay","jay@123");
+SELECT * FROM employee;
+INSERT INTO employee VALUE(1,"jp","jp@456");
+INSERT INTO employee VALUE(3,"moto",Null);
+insert into employee(name) value("patlu");
+
+CREATE TABLE employee1(id INT default 0,name CHAR(20),email CHAR(20) );
+
+insert into employee1(name, email) values("raman","raman@gmail.com");
+select * from employee1;
+
+create table company 
+(
+ company_id int NOT NULL AUTO_INCREMENT,
+ name char(20), dates date default now(),
+ primary key(company_id)
+ );
+show tables;
+desc company;
+
+insert into company(name) 
+values("abc"),("abc2");
+select * from company;
