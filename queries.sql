@@ -181,23 +181,85 @@ DESC employee;
 INSERT INTO employee VALUE(1,"jay","jay@123");
 SELECT * FROM employee;
 INSERT INTO employee VALUE(1,"jp","jp@456");
-INSERT INTO employee VALUE(3,"moto",Null);
-insert into employee(name) value("patlu");
+INSERT INTO employee VALUE(3,"moto",NULL);
+INSERT INTO employee(name) VALUE("patlu");
 
-CREATE TABLE employee1(id INT default 0,name CHAR(20),email CHAR(20) );
+CREATE TABLE employee1(id INT DEFAULT 0,name CHAR(20),email CHAR(20) );
 
-insert into employee1(name, email) values("raman","raman@gmail.com");
-select * from employee1;
+INSERT INTO employee1(name, email) VALUES("raman","raman@gmail.com");
+SELECT * FROM employee1;
 
-create table company 
+CREATE TABLE company 
 (
- company_id int NOT NULL AUTO_INCREMENT,
- name char(20), dates date default now(),
- primary key(company_id)
+ company_id INT NOT NULL AUTO_INCREMENT,
+ name CHAR(20), dates DATE DEFAULT NOW(),
+ PRIMARY KEY(company_id)
  );
-show tables;
-desc company;
+SHOW TABLES;
+DESC company;
 
-insert into company(name) 
-values("abc"),("abc2");
-select * from company;
+INSERT INTO company(name) 
+VALUES("abc"),("abc2");
+SELECT * FROM company;
+
+CREATE TABLE student2
+(sid INT , email CHAR(20) DEFAULT "not given");
+INSERT INTO student2 (sid) VALUES (4);
+SELECT * FROM student2;
+
+-- constaraints=> condition => invalid data cant be inserted
+-- not Null
+CREATE TABLE student4
+(sid INT NOT NULL DEFAULT 0 , email CHAR(20) DEFAULT "gmail.com");
+
+INSERT INTO student4(email) VALUES("a@gmail.com");
+INSERT INTO student4(sid,email) VALUES(NULL,"temp@gmail.com");
+SELECT * FROM student4;
+
+-- unique
+CREATE TABLE student_unique
+(sid INT UNIQUE , email CHAR(20) DEFAULT "gmail.com");
+INSERT INTO student_unique(sid) VALUES(3);
+SELECT * FROM student_unique;
+
+-- primary key
+-- drop table employee;
+
+CREATE TABLE employee(eid INT PRIMARY KEY , ename CHAR(20));  
+
+CREATE TABLE employee2
+(
+ eid INT NOT NULL AUTO_INCREMENT,
+ name CHAR(20),
+ PRIMARY KEY (eid)
+ );
+ 
+-- learn check key and foreign key 
+ 
+CREATE TABLE employee(eid INT PRIMARY KEY , ename CHAR(20));
+INSERT INTO employee(eid,ename) VALUES(1,"jay");
+
+-- data types
+ -- int 4 byte , big int 8 byte, tiny int 1 byte
+DROP TABLE ex2;
+CREATE TABLE ex2(eid INT UNSIGNED);
+INSERT INTO ex2 VALUES(33);
+SELECT * FROM ex2;
+
+CREATE TABLE test_bigint(id BIGINT UNSIGNED);
+
+-- all numeric perform by big int by internal
+
+INSERT INTO test_bigint VALUES(18446744073709551614);
+
+SELECT id*100 FROM test_bigint;
+
+-- boolean=>true/false => use tiny int 
+
+create table test_bool(i bool);
+insert into test_bool values(true),(false);
+select * from test_bool;
+insert into test_bool values(true),(false),(1),(0),(24),(-14);
+
+-- acid property in rdbms and how acid propert implemented in rdbms 
+-- constraints 
