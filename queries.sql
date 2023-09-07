@@ -256,10 +256,63 @@ SELECT id*100 FROM test_bigint;
 
 -- boolean=>true/false => use tiny int 
 
-create table test_bool(i bool);
-insert into test_bool values(true),(false);
-select * from test_bool;
-insert into test_bool values(true),(false),(1),(0),(24),(-14);
+CREATE TABLE test_bool(i BOOL);
+INSERT INTO test_bool VALUES(TRUE),(FALSE);
+SELECT * FROM test_bool;
+INSERT INTO test_bool VALUES(TRUE),(FALSE),(1),(0),(24),(-14);
 
 -- acid property in rdbms and how acid propert implemented in rdbms 
 -- constraints 
+USE test;
+CREATE TABLE characters(name CHAR(20));
+INSERT INTO characters VALUES("A B");
+SELECT name ,LENGTH(name) FROM characters;
+
+CREATE TABLE var_c(name VARCHAR(3));
+INSERT INTO var_c VALUES("Ja      ");
+SELECT name ,LENGTH(name) FROM var_c;
+
+-- varchar removes last spaces  
+-- char doesnt take spaces from back side 
+
+DROP TABLE employee;
+
+CREATE TABLE employee(name CHAR(20), age INT,CHECK(age>=18));
+INSERT INTO employee (name, age) VALUES("jay",21),("jjjay",18);
+
+CREATE TABLE ep1(gender CHAR(1), CHECK(gender IN('M','F','O')));
+INSERT INTO ep1 VALUES("M");
+SELECT * FROM ep1;
+
+CREATE TABLE ep2(name CHAR(20), age INT , gender CHAR(1),
+CHECK(age>=18 AND gender IN('M','F','O')));
+
+INSERT INTO ep2 (name, age,gender) 
+VALUES("jay",NULL,'M'),
+("jjjay",19,'M'),("pp",129,'M'),("ja",123,'M');
+
+SELECT * FROM ep2;
+
+-- Delete DMl 
+DELETE FROM ep2;
+DELETE FROM ep2 WHERE age = 19;
+DELETE FROM ep2 ORDER BY age LIMIT 1;
+SELECT * FROM ep2;
+
+-- Update DML
+UPDATE ep2 SET age=180;
+UPDATE ep2 SET age=20 WHERE name="pp";
+UPDATE ep2 SET age=29 LIMIT 2;
+
+-- drop remove schema as well as data  but it can be recovered ,can be rollback
+-- delete remove data only but it can also be recovered 
+-- truncate remove data of table, it is faster than delete,we cannot use rollback here , 
+-- and also cannot use where clause here
+-- internally truncate drop table and recreate table with same scheme 
+-- truncate is DDL;
+
+TRUNCATE TABLE ep2;
+-- HW - Group By ,distinct , filter using group by 
+
+
+
