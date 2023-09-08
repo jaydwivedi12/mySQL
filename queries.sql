@@ -314,5 +314,56 @@ UPDATE ep2 SET age=29 LIMIT 2;
 TRUNCATE TABLE ep2;
 -- HW - Group By ,distinct , filter using group by 
 
+-- cant uses alias in where
+-- also cant use join in alias 
+-- but we can use order by in alias
+-- alias means temporary name
+USE sakila;
+SELECT first_name ,
+CONCAT("MR ",first_name) AS FullName 
+FROM actor
+ORDER BY fullname;
 
+-- group by and aggregate function-- it is multi row function
+USE world;
+SHOW TABLES;
+DESC country;
+CREATE TABLE t1 (id INT, city VARCHAR(20));
+INSERT INTO t1 VALUES(1,"hii")
+,(2,"this"),(3,"jay");
+INSERT INTO t1 VALUES(4,NULL);
+INSERT INTO t1 VALUES(NULL,NULL);
 
+SELECT COUNT(*) FROM t1; 
+--  count(*) it count by counting rows and 
+-- if primary key is given then it count by primary key
+SELECT COUNT(id) FROM t1;
+SELECT COUNT(DISTINCT id) FROM t1;
+
+SELECT * FROM city;
+
+SELECT countrycode,COUNT(name),SUM(population) FROM city
+GROUP BY countrycode
+ORDER BY SUM(population); 
+
+SELECT CONCAT("country ",countrycode," Has total count ",COUNT(*),
+" and sum is ",SUM(population)) FROM city GROUP BY(countrycode);
+ 
+ -- having clause , we cant use where in group by, alias works here 
+SELECT countrycode,COUNT(name),
+SUM(population) AS Total_population FROM city
+GROUP BY countrycode HAVING total_population>5000 AND COUNT(id)>1 
+ORDER BY SUM(population); 
+
+SELECT countrycode,SUM(population) FROM city 
+WHERE population>200000 GROUP BY countrycode; 
+
+SELECT * FROM country;
+
+-- multiple group by 
+SELECT continent,region ,COUNT(*) FROM country 
+GROUP BY continent,region;
+
+ -- multiple group by with order by 
+SELECT continent,region ,COUNT(*) FROM country 
+GROUP BY continent,region order by continent,region;
