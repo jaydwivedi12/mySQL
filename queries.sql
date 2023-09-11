@@ -366,4 +366,65 @@ GROUP BY continent,region;
 
  -- multiple group by with order by 
 SELECT continent,region ,COUNT(*) FROM country 
-GROUP BY continent,region order by continent,region;
+GROUP BY continent,region ORDER BY continent,region;
+
+SELECT COUNT(continent) FROM country;
+
+SELECT continent,COUNT(*),SUM(population) FROM country
+GROUP BY continent HAVING COUNT(*)>50;
+
+-- set operations 
+
+use sakila;
+show tables;
+desc actor;
+desc actor_info;
+select first_name from actor limit 3;
+select first_name from actor_info
+order by first_name limit 3;
+
+-- union
+
+select first_name from actor
+union 
+select first_name from actor_info;
+
+
+create table abc(num int);
+insert into abc values(10),(5);
+
+create table xyz(num int);
+insert into xyz values(10),(20);
+
+select * from abc
+union 
+select * from xyz;
+
+-- union all gives all the values not filter disctinct but union gives distinct values
+select * from abc
+union all
+select * from xyz;
+
+-- intersect 
+-- gives common element 
+select * from abc
+intersect
+select * from xyz;
+
+-- except
+-- gives only first result set data but not into another one
+select * from abc
+except 
+select * from xyz;
+
+-- limitation in sets 
+-- no. of column should be same also there data type should be compatible
+-- if there data type will be different it will typecast into string type char or varchar 
+-- but column name can be different
+
+-- join
+
+-- inner join -gives common value from both table
+-- left join - gives value from left table 
+-- right join - gives value from right table
+-- full outer join means - all data left left and right and inner
