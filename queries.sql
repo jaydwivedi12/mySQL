@@ -375,47 +375,49 @@ GROUP BY continent HAVING COUNT(*)>50;
 
 -- set operations 
 
-use sakila;
-show tables;
-desc actor;
-desc actor_info;
-select first_name from actor limit 3;
-select first_name from actor_info
-order by first_name limit 3;
+USE sakila;
+SHOW TABLES;
+DESC actor;
+DESC actor_info;
+SELECT first_name FROM actor LIMIT 3;
+SELECT first_name FROM actor_info
+ORDER BY first_name LIMIT 3;
 
 -- union
 
-select first_name from actor
-union 
-select first_name from actor_info;
+SELECT first_name FROM actor
+UNION 
+SELECT first_name FROM actor_info;
 
 
-create table abc(num int);
-insert into abc values(10),(5);
+CREATE TABLE abc(num INT);
+INSERT INTO abc VALUES(10),(5);
 
-create table xyz(num int);
-insert into xyz values(10),(20);
+CREATE TABLE xyz(num INT);
+INSERT INTO xyz VALUES(10),(20);
 
-select * from abc
-union 
-select * from xyz;
+SELECT * FROM abc
+UNION 
+SELECT * FROM xyz;
 
 -- union all gives all the values not filter disctinct but union gives distinct values
-select * from abc
-union all
-select * from xyz;
+SELECT * FROM abc
+UNION ALL
+SELECT * FROM xyz;
 
 -- intersect 
 -- gives common element 
-select * from abc
-intersect
-select * from xyz;
+
+-- select * from abc
+-- intersect
+-- select * from xyz;
 
 -- except
 -- gives only first result set data but not into another one
-select * from abc
-except 
-select * from xyz;
+
+-- select * from abc
+-- except 
+-- select * from xyz;
 
 -- limitation in sets 
 -- no. of column should be same also there data type should be compatible
@@ -427,4 +429,58 @@ select * from xyz;
 -- inner join -gives common value from both table
 -- left join - gives value from left table 
 -- right join - gives value from right table
--- full outer join means - all data left left and right and inner
+-- full outer join means - all data - left and right and inner
+
+DESC actor;
+DESC actor_info;
+SELECT * FROM actor_info;
+SELECT * FROM actor;
+
+SELECT actor.actor_id,first_name ,film_id
+FROM actor INNER JOIN film_actor USING (actor_id);
+
+DROP TABLE student;
+CREATE TABLE student (id INT ,sname VARCHAR(20));
+INSERT INTO student VALUES(1,"jay");
+INSERT INTO student VALUES(2,"jp");
+INSERT INTO student VALUES(5,"dwivedi");
+
+CREATE TABLE student_hobby (id INT ,hobby VARCHAR(20));
+INSERT INTO student_hobby VALUES(1,"cricket");
+INSERT INTO student_hobby VALUES(2,"badm");
+INSERT INTO student_hobby VALUES(3,"football");
+
+-- method 1
+SELECT student.id,sname,hobby FROM student INNER JOIN student_hobby USING(id);
+-- method 2
+SELECT student.id,sname FROM student INNER JOIN student_hobby
+WHERE student.id = student_hobby.id;
+-- method 3 
+SELECT student.id,sname FROM student INNER JOIN student_hobby
+ON student.id = student_hobby.id;
+
+SELECT student.id,sname,hobby FROM student LEFT JOIN student_hobby
+ON student.id = student_hobby.id;
+
+SELECT student.id,sname,hobby FROM student RIGHT JOIN student_hobby
+ON student.id = student_hobby.id;
+
+-- full join is not supported in mysql - for full join use left and right and then have union
+
+-- miltiple joins
+select * from actor;
+select * from film_actor;
+select * from film;
+
+SELECT a.actor_id,first_name,last_name,film_id,
+title,release_year FROM 
+actor AS a 
+INNER JOIN 
+film_actor AS f
+ON a.actor_id=f.actor_id
+inner join
+film using(film_id);
+
+
+
+
