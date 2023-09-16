@@ -431,6 +431,10 @@ SELECT * FROM xyz;
 -- right join - gives value from right table
 -- full outer join means - all data - left and right and inner
 
+-- cross join - it matches each row with another each row of tables
+-- inner join - if we have similiar colimn name then it works as inner join and if column name
+-- is different then it work as cross join
+
 DESC actor;
 DESC actor_info;
 SELECT * FROM actor_info;
@@ -468,9 +472,9 @@ ON student.id = student_hobby.id;
 -- full join is not supported in mysql - for full join use left and right and then have union
 
 -- miltiple joins
-select * from actor;
-select * from film_actor;
-select * from film;
+SELECT * FROM actor;
+SELECT * FROM film_actor;
+SELECT * FROM film;
 
 SELECT a.actor_id,first_name,last_name,film_id,
 title,release_year FROM 
@@ -478,9 +482,65 @@ actor AS a
 INNER JOIN 
 film_actor AS f
 ON a.actor_id=f.actor_id
-inner join
-film using(film_id);
+INNER JOIN
+film USING(film_id);
+
+SELECT title,COUNT(rental_id) AS total  FROM 
+film INNER JOIN inventory USING (film_id)
+INNER JOIN rental USING (inventory_id) 
+GROUP BY title HAVING COUNT(rental_id) >15
+ORDER BY total DESC LIMIT 5;
+
+SELECT c.customer_id,r.rental_id,c.email,i.film_id,f.category_id
+FROM customer AS c 
+INNER JOIN rental AS r USING (customer_id)
+INNER JOIN inventory AS i USING (inventory_id)
+INNER JOIN film_category AS f USING (film_id)
+INNER JOIN category USING (category_id);
+
+SELECT * FROM category;
+
+SELECT cus.email,cat.name,COUNT(fc.category_id) AS categorycount
+FROM customer AS cus 
+INNER JOIN rental AS r USING (customer_id)
+INNER JOIN inventory AS inv USING (inventory_id)
+INNER JOIN film_category AS fc USING (film_id)
+INNER JOIN category AS cat USING (category_id)
+GROUP BY email,name
+HAVING categorycount>2;
 
 
+SELECT * FROM film_category;
 
+-- self join 
 
+CREATE TABLE employee(eid INT ,ename VARCHAR(20),email VARCHAR(20), manager_id INT);
+INSERT INTO employee VALUES (1, "jay","jay@gmail.com", NULL);
+INSERT INTO employee VALUES (2, "ram","ram@gmail.com", 1);
+INSERT INTO employee VALUES (3, "shyam","shyam@gmail.com", 4);
+INSERT INTO employee VALUES (4, "yashu","yashu@gmail.com", 2);
+
+SELECT * FROM employee;
+
+SELECT emp.eid,emp.ename, emp.manager_id,
+manager.eid AS managerid,manager.ename AS manager
+FROM employee AS emp,
+employee AS manager 
+WHERE emp.manager_id=manager.eid;
+
+-- NOTE: During multiple joins,if you have used using at once for a join
+-- and then you have used where/on for another join then it will create where,on as 
+-- inner join and other as given which give innaccurate result
+-- make sure to follow same way of join in complete query - using/where/on
+
+-- nested queries
+
+SELECT rental_duration FROM film 
+WHERE film_id=1; 
+
+SELECT film_id ,rental_duration FROM film 
+WHERE rental_duration=6;
+
+-- single result subquery/single result nested query
+SELECT film_id ,rental_duration FROM film 
+WHERE rental_duration=(select rental_duration from film where film_id=1);
