@@ -434,6 +434,7 @@ SELECT * FROM xyz;
 -- cross join - it matches each row with another each row of tables
 -- inner join - if we have similiar colimn name then it works as inner join and if column name
 -- is different then it work as cross join
+-- natural join - it given distinct column name with common rows value ,  no need to use any using, where , on clause in inner join 
 
 DESC actor;
 DESC actor_info;
@@ -456,6 +457,7 @@ INSERT INTO student_hobby VALUES(3,"football");
 
 -- method 1
 SELECT student.id,sname,hobby FROM student INNER JOIN student_hobby USING(id);
+-- using give distinct column 
 -- method 2
 SELECT student.id,sname FROM student INNER JOIN student_hobby
 WHERE student.id = student_hobby.id;
@@ -524,12 +526,12 @@ SELECT * FROM employee;
 
 SELECT emp.eid,emp.ename, emp.manager_id,
 manager.eid AS managerid,manager.ename AS manager
-FROM employee AS emp,
+FROM employee AS emp INNER JOIN 
 employee AS manager 
 WHERE emp.manager_id=manager.eid;
 
 -- NOTE: During multiple joins,if you have used using at once for a join
--- and then you have used where/on for another join then it will create where,on as 
+-- and then you used where/on for another join then it will create where,on as 
 -- inner join and other as given which give innaccurate result
 -- make sure to follow same way of join in complete query - using/where/on
 
@@ -543,4 +545,33 @@ WHERE rental_duration=6;
 
 -- single result subquery/single result nested query
 SELECT film_id ,rental_duration FROM film 
-WHERE rental_duration=(select rental_duration from film where film_id=1);
+WHERE rental_duration=(SELECT rental_duration FROM film WHERE film_id=1);
+
+SELECT * FROM employees;
+
+SELECT * FROM employees WHERE hire_date>
+(SELECT hire_date FROM employees WHERE emp_no=10003); 
+
+select title from titles where emp_no in (10001);
+
+select * from titles where title =(select title from titles where emp_no=10001);
+
+select title from titles where emp_no in (10001,10002);
+
+-- if subquery return more than 1 row than we cant use conditional operatiom 
+-- we use Any here to get result 
+
+select * from titles where title = 
+any (select title from titles where emp_no in (10001,1002));
+-- =any (quivalent to all result set value)
+
+
+select * from salaries where salary >
+any (select salary from salaries where emp_no in (10001,10002));
+
+
+select * from salaries where salary <
+any (select salary from salaries where emp_no in (10001,10002))order by salary desc;
+
+-- < ANY returns rows where the "salary" is less than the minimum salary among employees 10001 and 10002.
+-- > ANY returns rows where the "salary" is greater than the maximum salary among employees 10001 and 10002.
