@@ -457,9 +457,11 @@ INSERT INTO student_hobby VALUES(3,"football");
 
 -- method 1
 SELECT student.id,sname,hobby FROM student INNER JOIN student_hobby USING(id);
--- using give distinct column 
 -- method 2
 SELECT student.id,sname FROM student INNER JOIN student_hobby
+WHERE student.id = student_hobby.id;
+
+SELECT student.id,sname FROM student,student_hobby
 WHERE student.id = student_hobby.id;
 -- method 3 
 SELECT student.id,sname FROM student INNER JOIN student_hobby
@@ -552,26 +554,120 @@ SELECT * FROM employees;
 SELECT * FROM employees WHERE hire_date>
 (SELECT hire_date FROM employees WHERE emp_no=10003); 
 
-select title from titles where emp_no in (10001);
+SELECT title FROM titles WHERE emp_no IN (10001);
 
-select * from titles where title =(select title from titles where emp_no=10001);
+SELECT * FROM titles WHERE title =(SELECT title FROM titles WHERE emp_no=10001);
 
-select title from titles where emp_no in (10001,10002);
+SELECT title FROM titles WHERE emp_no IN (10001,10002);
 
 -- if subquery return more than 1 row than we cant use conditional operatiom 
 -- we use Any here to get result 
 
-select * from titles where title = 
-any (select title from titles where emp_no in (10001,1002));
+SELECT * FROM titles WHERE title = 
+ANY (SELECT title FROM titles WHERE emp_no IN (10001,1002));
 -- =any (quivalent to all result set value)
 
+SELECT * FROM salaries WHERE emp_no=10001 OR emp_no=10002 ORDER BY salary DESC;
+SELECT * FROM salaries WHERE emp_no=10001 OR emp_no=10002 ORDER BY salary ;
 
-select * from salaries where salary >
-any (select salary from salaries where emp_no in (10001,10002));
+SELECT * FROM salaries WHERE salary >
+ANY (SELECT salary FROM salaries WHERE emp_no IN (10001,10002));
 
 
-select * from salaries where salary <
-any (select salary from salaries where emp_no in (10001,10002))order by salary desc;
+SELECT * FROM salaries WHERE salary <
+ANY (SELECT salary FROM salaries WHERE emp_no IN (10001,10002));
 
--- < ANY returns rows where the "salary" is less than the minimum salary among employees 10001 and 10002.
--- > ANY returns rows where the "salary" is greater than the maximum salary among employees 10001 and 10002.
+-- < ANY returns rows where the "salary" is less than the maximum salary among employees 10001 and 10002.
+-- > ANY returns rows where the "salary" is greater than the minimum salary among employees 10001 and 10002.
+
+CREATE TABLE a(id INT);
+INSERT INTO a VALUES(NULL);
+
+CREATE TABLE b(newid INT);
+INSERT INTO b VALUES(null);
+
+
+SELECT * FROM b WHERE newid>10;
+
+SELECT * FROM b 
+WHERE newid = ANY(SELECT id FROM a);
+
+SELECT * FROM a;
+SELECT * FROM b;
+
+SELECT * FROM a
+WHERE id < ALL(SELECT newid FROM b);
+
+-- it conflicts in null doesnt not weather its value is greater than null or less than 
+SELECT * FROM a
+WHERE id < ALL(SELECT newid FROM b where newid is not null);
+
+SELECT * FROM b 
+WHERE newid in (SELECT id FROM a);
+
+use employees;
+select * from employees 
+where emp_no between 10001 and 10005;
+
+select * from employees; 
+select * from titles;
+
+select e.emp_no,title from employees as e
+inner join title as t using(emp_no);
+
+select e.emp_no from employees as e
+inner join titles as t using(emp_no) where title <> "manager";
+
+select emp_no,first_name,last_name,title from employees 
+join titles using(emp_no)
+where title="manager"
+and emp_no = any (select emp_no from employees
+join titles using(emp_no) where title <> "manager");  
+-- this give result jo khud manager hai , aur unka jo manager hai vo na dikhe
+-- this can also perform using join only no need to use nested
+
+select emp_no, first_name, last_name ,mgr.title
+from employees join titles mgr using (emp_no)
+join titles nonmgr using (emp_no)
+where mgr.title= "manager"
+and nonmgr.title<>"manager";
+
+
+select employees.emp_no,first_name,last_name,title
+from employees,titles
+where employees.emp_no=titles.emp_no
+and first_name="georgi"
+and last_name="klassen"
+and title="staff";
+
+select employees.emp_no,first_name,last_name
+from employees,titles
+where (employees.emp_no,first_name,last_name,title)=
+(titles.emp_no,"Georgi","klassen","staff");
+
+
+select mgr.emp_no, year(mgr.from_date), year(other.from_date),
+  mgr.from_date as fd,mgr.title as mgr_title,other.title as emp_title
+from titles as mgr, titles as other
+where mgr.emp_no= other.emp_no and mgr.title="manager"
+and mgr.title<>other.title
+and year(mgr.from_date)=year(other.from_date);
+
+select emp_no,year(from_date),title from titles where title <> "manager";
+
+-- row subquery
+select emp_no, year(from_date) as fd
+from titles where title="manager"
+and (emp_no,year(from_date)) in
+  (select emp_no, year(from_date) from titles where title<>"manager");
+  
+  
+  -- question 
+  -- find out salary and total count of salary for those data where the total number of salary person is greater than the salary person of the salary >=60117;
+  select * from salaries;
+  
+  select salary,count(salary) from salaries 
+  group by salary 
+  having count(salary) >= 
+  (select count(salary)from salaries where salary=60117);
+  
