@@ -584,7 +584,7 @@ CREATE TABLE a(id INT);
 INSERT INTO a VALUES(NULL);
 
 CREATE TABLE b(newid INT);
-INSERT INTO b VALUES(null);
+INSERT INTO b VALUES(NULL);
 
 
 SELECT * FROM b WHERE newid>10;
@@ -600,74 +600,156 @@ WHERE id < ALL(SELECT newid FROM b);
 
 -- it conflicts in null doesnt not weather its value is greater than null or less than 
 SELECT * FROM a
-WHERE id < ALL(SELECT newid FROM b where newid is not null);
+WHERE id < ALL(SELECT newid FROM b WHERE newid IS NOT NULL);
 
 SELECT * FROM b 
-WHERE newid in (SELECT id FROM a);
+WHERE newid IN (SELECT id FROM a);
 
-use employees;
-select * from employees 
-where emp_no between 10001 and 10005;
+USE employees;
+SELECT * FROM employees 
+WHERE emp_no BETWEEN 10001 AND 10005;
 
-select * from employees; 
-select * from titles;
+SELECT * FROM employees; 
+SELECT * FROM titles;
 
-select e.emp_no,title from employees as e
-inner join title as t using(emp_no);
+SELECT e.emp_no,title FROM employees AS e
+INNER JOIN title AS t USING(emp_no);
 
-select e.emp_no from employees as e
-inner join titles as t using(emp_no) where title <> "manager";
+SELECT e.emp_no FROM employees AS e
+INNER JOIN titles AS t USING(emp_no) WHERE title <> "manager";
 
-select emp_no,first_name,last_name,title from employees 
-join titles using(emp_no)
-where title="manager"
-and emp_no = any (select emp_no from employees
-join titles using(emp_no) where title <> "manager");  
+SELECT emp_no,first_name,last_name,title FROM employees 
+JOIN titles USING(emp_no)
+WHERE title="manager"
+AND emp_no = ANY (SELECT emp_no FROM employees
+JOIN titles USING(emp_no) WHERE title <> "manager");  
 -- this give result jo khud manager hai , aur unka jo manager hai vo na dikhe
 -- this can also perform using join only no need to use nested
 
-select emp_no, first_name, last_name ,mgr.title
-from employees join titles mgr using (emp_no)
-join titles nonmgr using (emp_no)
-where mgr.title= "manager"
-and nonmgr.title<>"manager";
+SELECT emp_no, first_name, last_name ,mgr.title
+FROM employees JOIN titles mgr USING (emp_no)
+JOIN titles nonmgr USING (emp_no)
+WHERE mgr.title= "manager"
+AND nonmgr.title<>"manager";
 
 
-select employees.emp_no,first_name,last_name,title
-from employees,titles
-where employees.emp_no=titles.emp_no
-and first_name="georgi"
-and last_name="klassen"
-and title="staff";
+SELECT employees.emp_no,first_name,last_name,title
+FROM employees,titles
+WHERE employees.emp_no=titles.emp_no
+AND first_name="georgi"
+AND last_name="klassen"
+AND title="staff";
 
-select employees.emp_no,first_name,last_name
-from employees,titles
-where (employees.emp_no,first_name,last_name,title)=
+SELECT employees.emp_no,first_name,last_name
+FROM employees,titles
+WHERE (employees.emp_no,first_name,last_name,title)=
 (titles.emp_no,"Georgi","klassen","staff");
 
 
-select mgr.emp_no, year(mgr.from_date), year(other.from_date),
-  mgr.from_date as fd,mgr.title as mgr_title,other.title as emp_title
-from titles as mgr, titles as other
-where mgr.emp_no= other.emp_no and mgr.title="manager"
-and mgr.title<>other.title
-and year(mgr.from_date)=year(other.from_date);
+SELECT mgr.emp_no, YEAR(mgr.from_date), YEAR(other.from_date),
+  mgr.from_date AS fd,mgr.title AS mgr_title,other.title AS emp_title
+FROM titles AS mgr, titles AS other
+WHERE mgr.emp_no= other.emp_no AND mgr.title="manager"
+AND mgr.title<>other.title
+AND YEAR(mgr.from_date)=YEAR(other.from_date);
 
-select emp_no,year(from_date),title from titles where title <> "manager";
+SELECT emp_no,YEAR(from_date),title FROM titles WHERE title <> "manager";
 
 -- row subquery
-select emp_no, year(from_date) as fd
-from titles where title="manager"
-and (emp_no,year(from_date)) in
-  (select emp_no, year(from_date) from titles where title<>"manager");
+SELECT emp_no, YEAR(from_date) AS fd
+FROM titles WHERE title="manager"
+AND (emp_no,YEAR(from_date)) IN
+  (SELECT emp_no, YEAR(from_date) FROM titles WHERE title<>"manager");
   
   
   -- question 
   -- find out salary and total count of salary for those data where the total number of salary person is greater than the salary person of the salary >=60117;
-  select * from salaries;
+  SELECT * FROM salaries;
   
-  select salary,count(salary) from salaries 
-  group by salary 
-  having count(salary) >= 
-  (select count(salary)from salaries where salary=60117);
+  SELECT salary,COUNT(salary) FROM salaries 
+  GROUP BY salary 
+  HAVING COUNT(salary) >= 
+  (SELECT COUNT(salary)FROM salaries WHERE salary=60117);
   
+  --  question Find out the emp_no and second higest salary from salaries table using subquery
+  
+  SELECT * FROM salaries
+  ORDER BY salary DESC;
+  SELECT MAX(salary) FROM salaries;
+
+SELECT emp_no, salary
+FROM salaries
+WHERE salary = (
+SELECT MAX(salary)
+FROM salaries
+WHERE salary < (SELECT MAX(salary) FROM salaries)
+);
+
+-- exists keyword
+SELECT COUNT(*) FROM departments WHERE EXISTS 
+(SELECT * FROM dept_emp WHERE emp_no<100);
+USE sakila;
+
+SELECT first_name ,last_name FROM staff;
+SELECT * FROM customer WHERE first_name="jon";
+
+-- co-related 
+SELECT first_name ,last_name FROM staff
+WHERE EXISTS(SELECT * FROM customer WHERE
+customer.first_name=staff.first_name 
+AND customer.last_name=staff.last_name );
+
+SELECT COUNT(*) FROM inventory,film 
+WHERE inventory.film_id=film.film_id
+GROUP BY film.film_id;
+
+USE employees;
+
+-- nested query in from  Clause
+SELECT * FROM 
+(SELECT emp_no, YEAR(birth_date) FROM employees) AS xyz;
+
+SELECT emp_no,monthly_salary FROM
+(SELECT emp_no,salary/12 AS monthly_salary FROM salaries ) AS ms LIMIT 5;
+
+
+USE sakila;
+SELECT SUM(amount),film_id 
+FROM payment 
+JOIN rental USING(rental_id)
+JOIN inventory USING(inventory_id)
+JOIN film USING(film_id)
+GROUP BY film_id ;
+
+select avg(newamount) from 
+(
+SELECT SUM(amount) as newamount,film_id 
+FROM payment 
+JOIN rental USING(rental_id)
+JOIN inventory USING(inventory_id)
+JOIN film USING(film_id)
+GROUP BY film_id ) as moviegroup;
+
+-- case statement 
+select * from payment;
+
+select 
+case 
+when rental_id=76 then rental_id
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
