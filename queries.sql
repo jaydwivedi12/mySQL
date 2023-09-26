@@ -794,36 +794,83 @@ WHERE ( YEAR(cde.to_date)-YEAR(cde.from_date))*12>400;
 
 
 -- Q5 - deploy and create foreign key from one table to another table
-use test;
+USE test;
 
-create table college(
-                      clg_id int, clg_name varchar(50),primary key(clg_id)
+CREATE TABLE college(
+                      clg_id INT, clg_name VARCHAR(50),PRIMARY KEY(clg_id)
                       );
 
 
-create table university(
-						uni_id int,uni_name varchar(50),clg_id int,
-                        foreign key(clg_id) references college(clg_id)
+CREATE TABLE university(
+						uni_id INT,uni_name VARCHAR(50),clg_id INT,
+                        FOREIGN KEY(clg_id) REFERENCES college(clg_id)
                         );
 
-select * from college;
-select * from university;
-insert into college value(3,"mitrc");
-insert into university values(201,"BTU",2);
+SELECT * FROM college;
+SELECT * FROM university;
+INSERT INTO college VALUE(3,"mitrc");
+INSERT INTO university VALUES(201,"BTU",2);
 
-select * from university as u 
-inner join college as c 
-using(clg_id);
+SELECT * FROM university AS u 
+INNER JOIN college AS c 
+USING(clg_id);
 
+USE employees;
+SELECT * FROM employees;
 
+-- float -- 4 byte and double -- 8 byte
+USE test;
 
+CREATE TABLE xyz(price1 DOUBLE(5,2));
+INSERT INTO xyz VALUES(1.23);
+SELECT * FROM xyz;
+DROP TABLE xyz;
 
+-- date 
+CREATE TABLE xyz (birthdate DATE,birthtime TIME,
+birthdata DATETIME);
+-- YYYY-MM-DD HH:MM:SS
+INSERT INTO xyz VALUE("2020-02-12", "02:38:00","2022-09-27 01:20:00");
+INSERT INTO xyz VALUE(CURDATE(),CURTIME(),NOW());
+SELECT * FROM xyz;
+SELECT birthdata,YEAR(birthdata),WEEK(birthdata),
+QUARTER(birthdata),MONTHNAME(birthdata) FROM xyz;
 
+SELECT DATEDIFF(birthdata,birthdate) FROM xyz;
+SELECT birthdata,DATE_ADD(birthdata,INTERVAL 2 YEAR)FROM xyz;
+SELECT birthdata,DATE_SUB(birthdata,INTERVAL 2 HOUR)FROM xyz;
 
+SELECT CONCAT(
+YEAR(birthdata),
+" ",MONTHNAME(birthdata),
+" " ,DATE(birthdata)," ",WEEK(birthdata),
+" ",WEEKDAY(birthdata)) AS ans FROM xyz;
 
+SELECT 
+    CONCAT_WS(' ', YEAR(birthdata), MONTHNAME(birthdata), DATE(birthdata), WEEK(birthdata), WEEKDAY(birthdata)) AS ans
+FROM xyz;
 
+SELECT birthdata,DATE_FORMAT(birthdata, "%Y %b") FROM xyz;
 
+-- timestamp 1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07'
 
+CREATE TABLE captions
+(     text VARCHAR(50),
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
 
+INSERT INTO captions (text) VALUE("hello");
 
+SELECT * FROM captions;
+
+CREATE TABLE captions2
+(     text VARCHAR(50),
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     updated_at TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);
+
+INSERT INTO captions2 (text) VALUE("hello");
+INSERT INTO captions2(text,created_at) VALUE("hii","2022-09-27 01:20:00");
+
+UPDATE captions2 SET created_at="2020-08-27 01:20:00" WHERE text="hello";
+
+SELECT * FROM captions2;
 
