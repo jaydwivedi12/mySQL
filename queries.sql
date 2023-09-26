@@ -721,25 +721,99 @@ JOIN inventory USING(inventory_id)
 JOIN film USING(film_id)
 GROUP BY film_id ;
 
-select avg(newamount) from 
+SELECT AVG(newamount) FROM 
 (
-SELECT SUM(amount) as newamount,film_id 
+SELECT SUM(amount) AS newamount,film_id 
 FROM payment 
 JOIN rental USING(rental_id)
 JOIN inventory USING(inventory_id)
 JOIN film USING(film_id)
-GROUP BY film_id ) as moviegroup;
+GROUP BY film_id ) AS moviegroup;
 
 -- case statement 
-select * from payment;
+SELECT * FROM payment;
 
-select 
-case 
-when rental_id=76 then rental_id
+SELECT 
+    CASE 
+    WHEN rental_id=76 THEN rental_id+100
+    WHEN rental_id>=1000 THEN rental_id-100
+    ELSE rental_id=9999
+    END  AS newcol,
+payment_id ,amount FROM payment;
+
+SELECT 
+    CASE rental_id
+    WHEN 76 THEN rental_id+100
+    WHEN 100 THEN rental_id-100
+    ELSE "jay"
+    END  AS newcol,
+      rental_id, payment_id ,amount FROM payment;
+      
+-- Q1 - get emp_no,first_name, full name of every person
+ -- where the birth year is > greater than birth year emp_no 1003
+ -- and hire year is < hire year of 1005 from employees table
+SELECT * FROM employees;
+ SELECT emp_no, first_name, CONCAT(first_name," ",last_name ) AS full_name
+ FROM employees WHERE YEAR(birth_date)>
+ ( SELECT YEAR(birth_date) 
+    FROM employees WHERE emp_no=10003 );
+    
+    
+-- Q2 - get the info of those user where the hire year > among all hire of emp_no 10003 to 10007 from employees table
+SELECT * FROM employees 
+WHERE YEAR(hire_date)>
+ ALL ( SELECT YEAR(hire_date) 
+    FROM employees WHERE emp_no BETWEEN 10003 AND 10007) ;
+   
+   
+-- Q3 -find out the emp_no,dept_no and department name of those user who has work into  company for more than 28 years
+-- from departments and  current_dept_emp tables;
+SELECT * FROM departments;
+SELECT * FROM current_dept_emp; 
+ 
+SELECT  cd.emp_no,d.dept_no,d.dept_name 
+FROM departments AS d 
+INNER JOIN current_dept_emp AS cd
+USING(dept_no)
+WHERE YEAR(to_date)-YEAR(cd.from_date)>28 ;
 
 
+-- Q4- find out emp_name,emp_no, department_no ,department_name , year and total no of months work for company only for those 
+-- where total no of months is working is greater than > 400 from departments,employees and  current_dept_emp tables;
+SELECT * FROM departments;
+SELECT * FROM current_dept_emp; 
+SELECT * FROM employees;
+
+SELECT CONCAT(e.first_name," ",e.last_name) AS emp_name, cde.dept_no, d.dept_name,
+( YEAR(cde.to_date)-YEAR(cde.from_date) ) AS working_year,
+( YEAR(cde.to_date)-YEAR(cde.from_date) )*12 AS working_month
+FROM employees AS e
+INNER JOIN current_dept_emp AS cde USING(emp_no)
+INNER JOIN departments AS d USING(dept_no)
+WHERE ( YEAR(cde.to_date)-YEAR(cde.from_date))*12>400;
 
 
+-- Q5 - deploy and create foreign key from one table to another table
+use test;
+
+create table college(
+                      clg_id int, clg_name varchar(50),primary key(clg_id)
+                      );
+
+
+create table university(
+						uni_id int,uni_name varchar(50),clg_id int,
+                        foreign key(clg_id) references college(clg_id)
+                        );
+
+select * from college;
+select * from university;
+insert into college value(3,"mitrc");
+insert into university values(201,"BTU",2);
+
+select * from university as u 
+inner join college as c 
+using(clg_id);
 
 
 
