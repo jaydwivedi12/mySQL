@@ -874,3 +874,63 @@ UPDATE captions2 SET created_at="2020-08-27 01:20:00" WHERE text="hello";
 
 SELECT * FROM captions2;
 
+USE test;
+
+-- insert palindrome name 
+CREATE TABLE palindrome(id INT,primary_name VARCHAR(50),status BOOL,
+secondary_name VARCHAR(50), 
+CONSTRAINT test_data_palindrome_secName_check
+CHECK (REVERSE(secondary_name)=primary_name));
+
+INSERT INTO palindrome VALUES(10,"saras",TRUE,"saras");
+SELECT * FROM palindrome;
+
+
+-- constraint name check
+CREATE TABLE house(sales_price LONG, purchase_price LONG,
+     CONSTRAINT test_house_sp_check 
+     CHECK(sales_price>purchase_price));
+     
+INSERT INTO house VALUES(230,200);
+SELECT * FROM house;
+
+-- understanding foreign key 
+CREATE TABLE student(
+sno INT ,sname VARCHAR(20),sid INT, 
+CONSTRAINT test_student_relation
+FOREIGN KEY(sid) REFERENCES s_hobby(sid)
+)
+;
+CREATE TABLE s_hobby(sid INT PRIMARY KEY,hobby VARCHAR(20));
+
+DESC student;
+SELECT * FROM student;
+DESC s_hobby;
+SELECT * FROM s_hobby;
+
+INSERT INTO s_hobby VALUES(2,"football");
+-- if we want to insert into student table make sure it foreign key value must present into s_hobby(sid) primary key
+INSERT INTO student VALUES(10,"jay",1);
+INSERT INTO student VALUES(20,"jp",2);
+INSERT INTO student VALUES(40,"jay",2);
+
+
+create table customer_info (
+                           id int primary key, name varchar(40),
+                            city varchar(20),
+							country varchar(20),
+                            constraint test_customer_reference_country
+                            foreign key (city,country) 
+                            references country_info(country_city,country_name)
+                            );
+                            
+
+create table country_info(country_id int primary key,
+                           country_city varchar(20),
+                           country_name varchar(20),
+						   index idx_country_city_name (country_city,country_name)
+                          );
+                          
+desc customer_info;
+desc country_info;
+
