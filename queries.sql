@@ -432,7 +432,7 @@ SELECT * FROM xyz;
 -- full outer join means - all data - left and right and inner
 
 -- cross join - it matches each row with another each row of tables
--- inner join - if we have similiar colimn name then it works as inner join and if column name
+-- inner join - if we have similiar column name then it works as inner join and if column name
 -- is different then it work as cross join
 -- natural join - it given distinct column name with common rows value ,  no need to use any using, where , on clause in inner join 
 
@@ -560,7 +560,7 @@ SELECT * FROM titles WHERE title =(SELECT title FROM titles WHERE emp_no=10001);
 
 SELECT title FROM titles WHERE emp_no IN (10001,10002);
 
--- if subquery return more than 1 row than we cant use conditional operatiom 
+-- if subquery return more than 1 row than we cant use conditional operation
 -- we use Any here to get result 
 
 SELECT * FROM titles WHERE title = 
@@ -915,22 +915,158 @@ INSERT INTO student VALUES(20,"jp",2);
 INSERT INTO student VALUES(40,"jay",2);
 
 
-create table customer_info (
-                           id int primary key, name varchar(40),
-                            city varchar(20),
-							country varchar(20),
-                            constraint test_customer_reference_country
-                            foreign key (city,country) 
-                            references country_info(country_city,country_name)
+CREATE TABLE customer_info (
+                           id INT PRIMARY KEY, name VARCHAR(40),
+                            city VARCHAR(20),
+							country VARCHAR(20),
+                            CONSTRAINT test_customer_reference_country
+                            FOREIGN KEY (city,country) 
+                            REFERENCES country_info(country_city,country_name)
                             );
                             
 
-create table country_info(country_id int primary key,
-                           country_city varchar(20),
-                           country_name varchar(20),
-						   index idx_country_city_name (country_city,country_name)
+CREATE TABLE country_info(country_id INT PRIMARY KEY,
+                           country_city VARCHAR(20),
+                           country_name VARCHAR(20),
+						   INDEX idx_country_city_name (country_city,country_name)
                           );
                           
-desc customer_info;
-desc country_info;
+DESC customer_info;
+DESC country_info;
+
+SHOW TABLES;
+SELECT COUNT(*) FROM employees;
+INSERT INTO a VALUES(NULL);
+ALTER TABLE a ADD name VARCHAR(50); 
+SELECT COUNT(1) FROM employees ;
+
+-- virtual view
+
+CREATE VIEW actor_view AS
+SELECT actor_id,first_name FROM actor;
+
+SELECT * FROM actor_view;
+
+CREATE TABLE test (id INT, name VARCHAR(20));
+INSERT INTO test VALUES(1,"jay");
+INSERT INTO test VALUES(2,"aman");
+INSERT INTO test VALUES(3,"rohan");
+INSERT INTO test VALUES(4,"jp");
+
+SELECT name FROM test;
+
+CREATE VIEW testview AS
+SELECT name FROM test;
+
+SELECT * FROM testview WHERE name ="jay";
+
+-- if we insert,delete data into view it willl also reflect in original table or Vice versa
+SELECT * FROM testview;
+SELECT * FROM test;
+INSERT INTO testview VALUES("rahul");
+DELETE FROM testview WHERE name="rohan";
+
+
+-- changes in view
+
+CREATE OR REPLACE VIEW testview AS
+SELECT id,name FROM test;
+
+ALTER VIEW testview AS SELECT name FROM test WHERE id>2;
+SELECT * FROM testview;
+
+-- removing view
+DROP VIEW testview;
+
+-- view with join
+SELECT * FROM country;
+SELECT * FROM city;
+
+CREATE VIEW cityfinder_view AS 
+SELECT country_id,country,city_id,city FROM country
+INNER JOIN city 
+ USING(country_id);
+ 
+ SELECT * FROM cityfinder_view;
+ 
+ -- NOTE-- view -- update insertion and other DML can be done in simple view - not join ,subquery,distinct ....
+
+-- ifnull replace null with given value
+SELECT id,IFNULL(id,"#") FROM test;
+
+-- coalesce
+ALTER TABLE test ADD COLUMN salary INT;
+SELECT * FROM test;
+INSERT INTO test VALUES(4,NULL,100);
+INSERT INTO test VALUES(NULL,NULL,200);
+INSERT INTO test VALUES(NULL,NULL,NULL);
+
+SELECT id,name ,salary,COALESCE(id,name,salary) FROM test;
+
+-- Ques:create table having movieid,name,duration,price
+-- and another table customerid,cusname,movieId,watchDate
+-- now 1:show customer id , customer name,moviesname 
+ -- 2:get all information of cutomer whether they watched movie or not
+ -- 3:find cutomer id, customer name who watch movie after year 2000;
+-- 4. find out total time spent by a user watching movies and avaerage he watched
+-- 5. get the customer id, customer name who watched maximum number of movies 
+
+CREATE TABLE movie(
+                    movieid INT ,mname VARCHAR(40),duration TIME, price DECIMAL
+                    );
+
+ALTER TABLE movie ADD PRIMARY KEY(movieid);
+ALTER TABLE movie MODIFY COLUMN movieid INT AUTO_INCREMENT;
+ALTER TABLE movie MODIFY COLUMN price DECIMAL(3,1);
+DESC movie;
+
+INSERT  INTO movie (mname,duration,price) VALUES("nacho","2:3:20","52.5"),
+                                                 ("hell","1:40:25","3.5"),
+                                                 ("heaven","3:9:0","3.5"),
+                                                 ("dino","1:2:22","34.5");
+SELECT * FROM movie;
+
+
+CREATE TABLE customers(custid INT AUTO_INCREMENT PRIMARY KEY, 
+                        custname VARCHAR(20),movieId INT ,watchdate DATE,
+                        FOREIGN KEY (movieId) REFERENCES movie(movieid));
+
+INSERT  INTO customers (custname,movieId,watchdate) VALUES
+												("jay",1,"1999-02-15"),
+                                                 ("ramu",1,"2000-05-12"),
+                                                 ("shyamu",3,"1987-01-30"),
+                                                 ("aalsi",4,"1980-12-02"),
+                                                 ("jp",2,"1999-02-11"),
+                                                 ("aman",2,"2000-02-12"),
+                                                 ("sharma",3,"1887-11-20"),
+                                                 ("tushar",4,"1978-09-25"),
+                                                  ("aman",null,null),
+												("jay",2,"1999-02-15"),
+                                                 ("ramu",3,"2000-05-12"),
+                                                 ("shyamu",4,"1987-01-30");
+SELECT * FROM customers; 
+
+-- now 1:show customer id , customer name,moviesname 
+select custid, custname,mname from movie 
+inner join customers on (movie.movieid=customers.movieId);
+
+ -- 2:get all information of cutomer whether they watched movie or not
+ select *,ifnull(movieId,"N0 watch") from customers;
+
+-- 3:find cutomer id, customer name who watch movie after year 2000;
+select custid, custname from movie 
+inner join customers as c on (movie.movieid=c.movieId) where 
+year(c.watchdate)>=2000;
+
+-- 4. find out total time spent by a user watching movies and avaerage he watched
+select * from movie;
+select * from customers;
+select c.custname,
+                    time(sum(m.duration)) as total_watch_time,
+                    time(sum(m.duration)/count(c.movieId)) as avg_time from movie as m
+                     inner join customers c on (c.movieId=m.movieid) 
+                    group by c.custname;
+
+
+-- 5. get the customer id, customer name who watched maximum number of movies 
 
