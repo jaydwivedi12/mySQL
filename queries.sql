@@ -1059,14 +1059,90 @@ inner join customers as c on (movie.movieid=c.movieId) where
 year(c.watchdate)>=2000;
 
 -- 4. find out total time spent by a user watching movies and avaerage he watched
-select * from movie;
-select * from customers;
 select c.custname,
                     time(sum(m.duration)) as total_watch_time,
                     time(sum(m.duration)/count(c.movieId)) as avg_time from movie as m
                      inner join customers c on (c.movieId=m.movieid) 
                     group by c.custname;
 
-
 -- 5. get the customer id, customer name who watched maximum number of movies 
+select * from movie;
+select * from customers;
+
+select custname,count(movieId) from customers
+group by custname
+having count(movieId)=
+(select count(movieId) as total from customers group by custname 
+order by total desc limit 1) ; 
+
+create table employees(id int primary key auto_increment,
+dept varchar(20), salary int);
+
+insert into employees(dept,salary) values("hr",200),("hr",300),("hr",100),
+("marketing",70),("marketing",50),("marketing",200),
+("dsa",700),("dsa",800),("dsa",900);
+
+select avg(salary) from employees;
+select dept, avg (salary) from employees group by dept;
+
+-- windows function 
+-- gives result for every row
+ 
+ -- over() give result for every row
+ 
+ select id, dept , salary,
+ avg(salary) over() ,
+ max(salary) over() from employees;
+
+ select id, dept , salary,
+ sum(salary) over(partition by dept) as partitionSum 
+ from employees;
+
+ select id, dept , salary,
+variance(salary) over() from employees;
+ 
+ select id, dept , salary,
+ sum(salary) over(order by salary) as rollingSum 
+ from employees;
+ 
+  select id, dept , salary,
+ sum(salary) over(order by salary) as rollingSum 
+ from employees;
+ 
+select id, dept , salary,
+sum(salary) over(partition by dept) as partionSum ,
+sum(salary) over(partition by dept order by salary) as rollingSumOfDept 
+from employees;
+ 
+ select id,dept ,salary,
+ avg(salary) over (partition by dept) as dept_avg,
+ avg(salary) over () as company_avg
+ from employees;
+
+
+-- window functions 
+select id,dept,salary,
+rank() over(order by salary)
+from employees;
+
+select id,dept,salary,
+dense_rank() over(order by salary)
+from employees;
+
+select id, dept,salary,
+row_number()  over(order by salary)
+from employees;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
