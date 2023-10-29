@@ -1040,84 +1040,82 @@ INSERT  INTO customers (custname,movieId,watchdate) VALUES
                                                  ("aman",2,"2000-02-12"),
                                                  ("sharma",3,"1887-11-20"),
                                                  ("tushar",4,"1978-09-25"),
-                                                  ("aman",null,null),
+                                                  ("aman",NULL,NULL),
 												("jay",2,"1999-02-15"),
                                                  ("ramu",3,"2000-05-12"),
                                                  ("shyamu",4,"1987-01-30");
 SELECT * FROM customers; 
 
 -- now 1:show customer id , customer name,moviesname 
-select custid, custname,mname from movie 
-inner join customers on (movie.movieid=customers.movieId);
+SELECT custid, custname,mname FROM movie 
+INNER JOIN customers ON (movie.movieid=customers.movieId);
 
  -- 2:get all information of cutomer whether they watched movie or not
- select *,ifnull(movieId,"N0 watch") from customers;
+ SELECT *,IFNULL(movieId,"N0 watch") FROM customers;
 
 -- 3:find cutomer id, customer name who watch movie after year 2000;
-select custid, custname from movie 
-inner join customers as c on (movie.movieid=c.movieId) where 
-year(c.watchdate)>=2000;
+SELECT custid, custname FROM movie
+INNER JOIN customers AS c ON (movie.movieid=c.movieId) WHERE 
+YEAR(c.watchdate)>=2000;
 
 -- 4. find out total time spent by a user watching movies and avaerage he watched
-select c.custname,
-                    time(sum(m.duration)) as total_watch_time,
-                    time(sum(m.duration)/count(c.movieId)) as avg_time from movie as m
-                     inner join customers c on (c.movieId=m.movieid) 
-                    group by c.custname;
+SELECT c.custname,
+TIME(SUM(m.duration)) AS total_watch_time,
+TIME(SUM(m.duration)/COUNT(c.movieId)) AS avg_time FROM movie AS m
+INNER JOIN customers c ON (c.movieId=m.movieid) 
+GROUP BY c.custname;
 
 -- 5. get the customer id, customer name who watched maximum number of movies 
-select * from movie;
-select * from customers;
+SELECT * FROM movie;
+SELECT * FROM customers;
 
-select custname,count(movieId) from customers
-group by custname
-having count(movieId)=
-(select count(movieId) as total from customers group by custname 
-order by total desc limit 1) ; 
+SELECT custname,COUNT(movieId) FROM customers
+GROUP BY custname
+HAVING COUNT(movieId)=
+(SELECT COUNT(movieId) AS total FROM customers GROUP BY custname 
+ORDER BY total DESC LIMIT 1) ; 
 
-create table employees(id int primary key auto_increment,
-dept varchar(20), salary int);
+CREATE TABLE employees(id INT PRIMARY KEY AUTO_INCREMENT,
+dept VARCHAR(20), salary INT);
 
-insert into employees(dept,salary) values("hr",200),("hr",300),("hr",100),
+INSERT INTO employees(dept,salary) VALUES("hr",200),("hr",300),("hr",100),
 ("marketing",70),("marketing",50),("marketing",200),
 ("dsa",700),("dsa",800),("dsa",900);
 
-select avg(salary) from employees;
-select dept, avg (salary) from employees group by dept;
+SELECT AVG(salary) FROM employees;
+SELECT dept, AVG (salary) FROM employees GROUP BY dept;
 
--- windows function 
+-- windows function
 -- gives result for every row
- 
- -- over() give result for every row
- 
- select id, dept , salary,
- avg(salary) over() ,
- max(salary) over() from employees;
+-- over() give result for every row
 
- select id, dept , salary,
- sum(salary) over(partition by dept) as partitionSum 
- from employees;
+select id, dept,salary,avg(salary) over()
+,max(salary) over() from employees;
 
- select id, dept , salary,
+select id, dept , salary,
+sum(salary) over(partition by dept) as partitionSum 
+from employees;
+
+select id, dept , salary,
 variance(salary) over() from employees;
  
- select id, dept , salary,
- sum(salary) over(order by salary) as rollingSum 
- from employees;
+select id, dept , salary,
+sum(salary) over(order by salary) as rollingSum 
+from employees;
  
-  select id, dept , salary,
- sum(salary) over(order by salary) as rollingSum 
- from employees;
+select id, dept , salary,
+sum(salary) over(order by salary) as rollingSum 
+from employees;
  
 select id, dept , salary,
 sum(salary) over(partition by dept) as partionSum ,
 sum(salary) over(partition by dept order by salary) as rollingSumOfDept 
 from employees;
  
- select id,dept ,salary,
- avg(salary) over (partition by dept) as dept_avg,
- avg(salary) over () as company_avg
- from employees;
+select id,dept ,salary,
+avg(salary) over (partition by dept) as dept_avg,
+avg(salary) over () as company_avg
+from employees;
 
 
 -- window functions 
@@ -1133,16 +1131,170 @@ select id, dept,salary,
 row_number()  over(order by salary)
 from employees;
 
+show tables;
+select * from actor;
+select * from film_actor;
+
+select actor_id,count(actor_id) as no_of_movies from film_actor group by actor_id;
+
+-- TCL 
+drop table test;
+create table test(id int,name varchar(20));
+insert into test values(1,"jay"),(2,"jp");
+
+select @@autocommit;
+select * from test;
+set autocommit=0;
+update test set name="jd" where id=2;
+select * from test;
+
+set autocommit=1;
+
+start transaction;
+update test set name='jayt' where id=1;
+rollback;
+-- transaction end when we perfom rollback
 
 
+start transaction;
+update test set name='jayt' where id=1;
+commit;
+-- transaction end when we perform commit 
 
 
+start transaction;
+update test set name='hell0' where id=1;
+select * from test;
+create table ddlcheck(id int);
+rollback; -- this rollback will not work
+-- transaction ends when we perform DDL Command and it commit the transaction
+
+start transaction;
+insert into test values(30,"abhay");
+savepoint test_insert;
+update test set name='huhi' where id=2;
+rollback to test_insert;
+select * from test;
+
+-- view are stored query 
+-- these are virtual table 
+-- types  1. simple 2. complex
+-- simple view - clauses not use here except where clause
+-- complex view - all the clauses can be use here
+
+drop table employee;
+create table employee(id int, name varchar(20),salary int);
+insert into employee values(10,"abc",100),(20,"jay",200),(30,"prak",300);
+
+create view empView as select id , name from employee;
+select * from empView;
+ 
+insert into empView value(40,"dwivedi");
+-- inserting data into simple view also reflect into original table
+select * from employee;
+
+-- change view 
+-- can update using alter
+alter view empView as 
+select id,name from employee where id=3;
+
+-- can also done by this method
+create or replace view empView as 
+select id,name from employee where id=40;
+
+create table dept(id int ,deptname varchar(20));
+insert into dept values(10,"HR"),(20,"Marketing"),(30,"Digital");
+
+select * from employee;
+select * from dept;
+
+select e.id,e.name,d.deptname from employee e natural join dept d;
+
+create view empjoinView as 
+select e.id,e.name,d.deptname from employee e natural join dept d;
+select * from empjoinView;
+
+-- this is wrong 
+insert into empjoinView(id,name,deptname) values(60,"kilo","new"); 
+
+-- this is right
+insert into empjoinView(id,name) values(60,"kilo");
+select * from employee;
+
+-- DCL Commands
+select user(),current_user();
+
+select * from mysql.user;
+create user test identified by "test@123";
+drop user test;
+grant all privileges on sakila.actor to test;
 
 
+create user "jay"@"localhost" identified by "password";
+-- to drop user with ip we need to give ip in drop command
+drop user "jay"@"localhost";
 
 
+create user bob identified by "bob";
+
+alter user bob identified by "123"; -- change password 
+set password = "newpassword"; -- set current user password 
+-- for other user 
+set password for 'bob'="newpassword";
+
+-- lock user 
+alter user 'bob' account lock;
+-- unlock user
+alter user 'bob' account unlock;
+
+ALTER user 'bob' PASSWORD EXPIRE;
+ 
+-- rename user
+RENAME USER 'bob' TO 'robert';
+SELECT * FROM mysql.user;
+RENAME USER 'robert' TO 'bob';
+
+-- show all the privileges
+SHOW PRIVILEGES;
+
+-- select permission to all database to bob
+GRANT all ON *.* TO 'bob'; -- global privilege
+
+ -- assinging permission to two user at same time
+ GRANT SELECT ON db.* TO 'bob','shob'; -- database privilege
+ 
+ 
+-- select permission to sakila database to bob
+GRANT SELECT ON sakila.test TO 'bob'; -- object privilege
+
+-- all permission to sakila database to bob
+GRANT ALL ON sakila.* TO 'bob';
+
+-- permission to select and insert only name  
+GRANT select,INSERT(name) 
+on sakila.test to 'bob'; -- column privilege
+
+SHOW grants for 'bob';
+REVOKE SELECT on sakila.* from 'bob';
+
+-- removing all privilege with ability to assign the same to other use
+REVOKE ALL PRIVILEGES, GRANT OPTION FROM bob;
+
+ CREATE TABLE bobs_private_table
+(id int PRIMARY KEY, data TEXT);
 
 
+-- new user from root
+create user test identified by 'test';
 
+-- with GRANT to other user as well
+GRANT SELECT ON bobs_private_table TO bob with grant option;
+-- now bob can give GRANT on  bobs_private_table to others users also
 
+-- revoke GRANT option
+ REVOKE GRANT OPTION ON bobs_private_table FROM 'bob';
+ 
+REVOKE SELECT ON bobs_private_table from bob;
 
+DROP USER bob,test;
+select * from mysql.user;
