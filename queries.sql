@@ -1298,3 +1298,56 @@ REVOKE SELECT ON bobs_private_table from bob;
 
 DROP USER bob,test;
 select * from mysql.user;
+
+-- Indexing
+
+use test;
+CREATE TABLE regex(id int PRIMARY key AUTO_INCREMENT,
+name VARCHAR(20),salary INT);
+
+insert into regex(name,salary) values("jay",100000);
+insert into regex(name,salary) values("aman",100000);
+SELECT * FROM regex;
+show INDEXES from regex;
+
+-- creating index is predefined data 
+CREATE index regex_i on regex(name);
+insert into regex(name,salary) values("aman",300000);
+CREATE index regex_i2 on regex(name);
+
+SELECT * from regex where name="aman";
+
+explain SELECT * from regex where name="jay";
+drop index regex_i2 ON regex;
+show INDEXES from regex;
+
+-- prefix index 
+CREATE index regex_i_name on regex(name(2));
+show INDEXES from regex;
+explain select * FROM regex where name="am%";
+drop INDEX regex_i_name on regex;
+
+-- composite index
+CREATE INDEX regex_c on regex(name,salary);
+EXPLAIN select * from regex where name="jay";
+show indexes from regex;
+-- indexing works in first column not trailing column
+-- work well whwn both column is choosen 
+-- not work with or condition;studentstudentstudent
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
